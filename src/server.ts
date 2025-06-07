@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 
+import "./models";
+
 //Routes
 import usuarioRoutes from "./routes/usuarioRoutes";
 import obraSocialRoutes from "./routes/obraSocialRoute";
