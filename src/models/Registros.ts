@@ -1,0 +1,45 @@
+import { Schema, model, Document, Types, PopulatedDoc } from "mongoose";
+import { ICodigo } from "./Codigos";
+import { IPaciente } from "./Pacientes";
+import { IUsuario } from "./Usuarios";
+
+export interface IAtencion {
+  codigo: PopulatedDoc<ICodigo & Document>;
+  valor: number;
+  pagoDentista: number;
+  observaciones?: string;
+}
+export interface IRegistro extends Document {
+  fechaAtencion: Date;
+  usuario: PopulatedDoc<IUsuario & Document>;
+  paciente: PopulatedDoc<IPaciente & Document>;
+  atencion: IAtencion[];
+  pagado: boolean;
+}
+
+const RegistroSchema: Schema = new Schema<IRegistro>(
+  {
+    fechaAtencion: { type: Date, required: true },
+    usuario: { type: Schema.Types.ObjectId, ref: "usuarios", required: true },
+    paciente: { type: Schema.Types.ObjectId, ref: "pacientes", required: true },
+    atencion: [
+      {
+        codigo: { type: Schema.Types.ObjectId, ref: "codigos", required: true },
+        valor: { type: Number, required: true },
+        pagoDentista: { type: Number, required: true },
+        observaciones: { type: String, required: false },
+      },
+    ],
+    pagado: { type: Boolean, required: true, default: false },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+RegistroSchema.index({ paciente: 1 });
+RegistroSchema.index({ fechaAtencion: -1 });
+RegistroSchema.index({ paciente: 1, fechaAtencion: -1 });
+RegistroSchema.index({ pagado: 1 });
+
+export default model<IRegistro>("registros", RegistroSchema);
