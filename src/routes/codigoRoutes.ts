@@ -5,30 +5,33 @@ import { handleImputErrors } from "../middleware/validation";
 
 const route = Router();
 
+route.get("/", CodigoController.getAllCodigos);
+
+route.get(
+  "/:idCodigo",
+  param("idCodigo").isMongoId().withMessage("El ID del código es obligatorio y debe ser válido"),
+  handleImputErrors,
+  CodigoController.getCodigoById
+);
+
 route.post(
-  "/",
-  body("codigo").notEmpty().withMessage("El campo codigo es requerido"),
-  body("descripcion").notEmpty().withMessage("El campo descripcion es requerido"),
-  body("vigencia").notEmpty().withMessage("El campo vigencia es requerido"),
-  body("cantidad").notEmpty().withMessage("El campo cantidad es requerido"),
-  body("valor").notEmpty().withMessage("El campo valor es requerido"),
+  "/:idObraSocial/create",
+  [
+    param("idObraSocial").isMongoId().withMessage("El ID de la obra social es obligatorio y debe ser válido"),
+    body("code").notEmpty().withMessage("El código es obligatorio"),
+    body("description").notEmpty().withMessage("La descripción es obligatoria"),
+    body("validity").isDate().withMessage("La fecha de validez debe ser una fecha válida"),
+    body("price").isFloat({ gt: 0 }).withMessage("El precio debe ser un número mayor que cero"),
+  ],
   handleImputErrors,
   CodigoController.createCodigo
 );
-route.get("/", CodigoController.getAllCodigos);
-route.get("/:id", param("id").isMongoId().withMessage("El campo id es requerido"), handleImputErrors, CodigoController.getCodigoById);
-route.put(
-  "/:id",
-  param("id").isMongoId().withMessage("El campo id es requerido"),
-  body("codigo").notEmpty().withMessage("El campo codigo es requerido"),
-  body("descripcion").notEmpty().withMessage("El campo descripcion es requerido"),
-  body("vigencia").notEmpty().withMessage("El campo vigencia es requerido"),
-  body("cantidad").notEmpty().withMessage("El campo cantidad es requerido"),
-  body("valor").notEmpty().withMessage("El campo valor es requerido"),
+
+route.patch(
+  "/:idCodigo/change-state",
+  param("idCodigo").isMongoId().withMessage("El ID del código es obligatorio y debe ser válido"),
   handleImputErrors,
-  CodigoController.updateCodigo
+  CodigoController.changeStateCodigo
 );
-route.delete("/:id", param("id").isMongoId().withMessage("El campo id es requerido"), handleImputErrors, CodigoController.deleteCodigo);
-route.patch("/:id/enable", param("id").isMongoId().withMessage("El campo id es requerido"), handleImputErrors, CodigoController.enableCodigo);
 
 export default route;

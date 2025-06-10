@@ -6,7 +6,7 @@ export interface ICodigo extends Document {
   validity: Date;
   price: number;
   enable: boolean;
-  ObraSocial: Types.ObjectId;
+  obraSocial: Types.ObjectId;
 }
 const CodigoSchema: Schema = new Schema<ICodigo>(
   {
@@ -15,7 +15,7 @@ const CodigoSchema: Schema = new Schema<ICodigo>(
     validity: { type: Date, required: true },
     price: { type: Number, required: true },
     enable: { type: Boolean, required: true, default: true },
-    ObraSocial: { type: Schema.Types.ObjectId, ref: "obras_sociales", required: true },
+    obraSocial: { type: Schema.Types.ObjectId, ref: "obras_sociales", required: true },
   },
   {
     timestamps: true,

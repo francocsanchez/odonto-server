@@ -36,9 +36,9 @@ export class UsuarioController {
     }
   };
   static getUsuarioById = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+    const { idUsuario } = req.params;
     try {
-      const usuario = await Usuarios.findById(id);
+      const usuario = await Usuarios.findById(idUsuario);
       if (!usuario) {
         res.status(404).json({ message: "Usuario no encontrado" });
         return;
@@ -50,11 +50,11 @@ export class UsuarioController {
     }
   };
   static updateUsuario = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+    const { idUsuario } = req.params;
     const { email, password, name, lastName, enable } = req.body;
     try {
       const updatedUsuario = await Usuarios.findByIdAndUpdate(
-        id,
+        idUsuario,
         {
           name,
           lastName,
@@ -76,9 +76,9 @@ export class UsuarioController {
   };
 
   static changeStateUsuario = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+    const { idUsuario } = req.params;
     try {
-      const usuario = await Usuarios.findById(id);
+      const usuario = await Usuarios.findById(idUsuario);
       if (!usuario) {
         res.status(404).json({ message: "Usuario no encontrado" });
         return;

@@ -31,9 +31,9 @@ export class ObraSocialController {
   };
 
   static getObraSocialById = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+    const { idObraSocial } = req.params;
     try {
-      const obraSocial = await ObrasSociales.findById(id).populate("codes");
+      const obraSocial = await ObrasSociales.findById(idObraSocial).populate("codes");
       if (!obraSocial) {
         res.status(404).json({ message: "Obra social no encontrada" });
         return;
@@ -46,10 +46,10 @@ export class ObraSocialController {
   };
 
   static updateObraSocial = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+    const { idObraSocial } = req.params;
     const { name } = req.body;
     try {
-      const updatedObraSocial = await ObrasSociales.findByIdAndUpdate(id, { name }, { new: true });
+      const updatedObraSocial = await ObrasSociales.findByIdAndUpdate(idObraSocial, { name }, { new: true });
       if (!updatedObraSocial) {
         res.status(404).json({ message: "Obra social no encontrada" });
         return;
@@ -62,9 +62,9 @@ export class ObraSocialController {
   };
 
   static changeStateObraSocial = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
+    const { idObraSocial } = req.params;
     try {
-      const obraSocial = await ObrasSociales.findById(id);
+      const obraSocial = await ObrasSociales.findById(idObraSocial);
       if (!obraSocial) {
         res.status(404).json({ message: "Obra social no encontrada" });
         return;
@@ -72,7 +72,7 @@ export class ObraSocialController {
       obraSocial.enable = !obraSocial.enable;
       await obraSocial.save();
       res.status(200).json({
-        message: `Obra social ${obraSocial.enable ? "habilitada" : "deshabilitada"} exitosamente`,
+        message: `Obra social ${obraSocial.name} ${obraSocial.enable ? "habilitada" : "deshabilitada"} exitosamente`,
       });
     } catch (error) {
       console.error(colors.red(error.message));

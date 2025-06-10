@@ -8,12 +8,17 @@ export interface IUsuario extends Document {
   enable: boolean;
 }
 
-const UsuarioSchema: Schema = new Schema<IUsuario>({
-  name: { type: String, required: true },
-  lastName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  enable: { type: Boolean, required: true, default: true },
-});
+const UsuarioSchema: Schema = new Schema<IUsuario>(
+  {
+    name: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    enable: { type: Boolean, required: true, default: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export default model<IUsuario>("usuarios", UsuarioSchema);

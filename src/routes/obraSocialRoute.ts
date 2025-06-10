@@ -6,19 +6,36 @@ import { ObraSocialController } from "../controllers/ObraSocialController";
 const route = Router();
 
 route.get("/", ObraSocialController.getAllObrasSociales);
+
 route.post(
   "/",
   body("name").notEmpty().withMessage("El nombre de la obra social es obligatorio"),
   handleImputErrors,
   ObraSocialController.createObraSocial
 );
-route.get("/:id", param("id").isMongoId().withMessage("ID de obra social inválido"), handleImputErrors, ObraSocialController.getObraSocialById);
+
+route.get(
+  "/:idObraSocial",
+  param("idObraSocial").isMongoId().withMessage("ID de obra social inválido"),
+  handleImputErrors,
+  ObraSocialController.getObraSocialById
+);
+
 route.put(
-  "/:id",
-  param("id").isMongoId().withMessage("ID de obra social inválido"),
-  body("name").notEmpty().withMessage("El nombre de la obra social es obligatorio"),
+  "/:idObraSocial",
+  [
+    param("idObraSocial").isMongoId().withMessage("ID de obra social inválido"),
+    body("name").notEmpty().withMessage("El nombre de la obra social es obligatorio"),
+  ],
   handleImputErrors,
   ObraSocialController.updateObraSocial
+);
+
+route.post(
+  "/:idObraSocial/change-state",
+  param("idObraSocial").isMongoId().withMessage("ID de obra social inválido"),
+  handleImputErrors,
+  ObraSocialController.changeStateObraSocial
 );
 
 export default route;
