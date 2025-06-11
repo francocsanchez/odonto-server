@@ -1,6 +1,6 @@
 import colors from "colors";
 import { Request, Response } from "express";
-import { Codigos, ObrasSociales } from "../models";
+import { Codigos } from "../models";
 
 export class CodigoController {
   static getAllCodigos = async (req: Request, res: Response): Promise<void> => {
@@ -14,18 +14,9 @@ export class CodigoController {
   };
 
   static createCodigo = async (req: Request, res: Response): Promise<void> => {
-    const { idObraSocial } = req.params;
-    const obraSocial = await ObrasSociales.findById(idObraSocial);
-
-    if (!obraSocial) {
-      const error = new Error("Obra social no encontrada");
-      res.status(404).json(error.message);
-      return;
-    }
-
     try {
       const { code, description, validity, price } = req.body;
-      const codeExists = await Codigos.findOne({ code, obraSocial: obraSocial.id });
+      const codeExists = await Codigos.findOne({ code, obraSocial: req.obraSocial.id });
 
       if (codeExists) {
         const error = new Error("El código ya existe para esta obra social");
@@ -33,11 +24,11 @@ export class CodigoController {
         return;
       }
 
-      const newCodigo = new Codigos({ code, description, validity, price, obraSocial: obraSocial.id });
+      const newCodigo = new Codigos({ code, description, validity, price, obraSocial: req.obraSocial.id });
 
-      obraSocial.codes.push(newCodigo.id);
+      req.obraSocial.codes.push(newCodigo.id);
 
-      await Promise.allSettled([newCodigo.save(), obraSocial.save()]);
+      await Promise.allSettled([newCodigo.save(), req.obraSocial.save()]);
 
       res.status(201).json("Código creado exitosamente");
     } catch (error) {
@@ -82,6 +73,21 @@ export class CodigoController {
     } catch (error) {
       console.error(colors.red(error.message));
       res.status(500).json({ message: "Error al obtener el código" });
+    }
+  };
+
+  static getCodigosByObraSocial = async (req: Request, res: Response): Promise<void> => {
+    const { idObraSocial } = req.params;
+    try {
+      const codigos = await Codigos.find({ obraSocial: idObraSocial }).populate("obraSocial");
+      if (codigos.length === 0) {
+        res.status(404).json({ message: "No se encontraron códigos para esta obra social" });
+        return;
+      }
+      res.status(200).json(codigos);
+    } catch (error) {
+      console.error(colors.red(error.message));
+      res.status(500).json({ message: "Error al obtener los códigos de la obra social" });
     }
   };
 }

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { body, param } from "express-validator";
 import { CodigoController } from "../controllers/CodigoController";
 import { handleImputErrors } from "../middleware/validation";
+import { validateObraSocial } from "../middleware/obraSocial";
 
 const route = Router();
 
@@ -16,8 +17,9 @@ route.get(
 
 route.post(
   "/:idObraSocial/create",
+  param("idObraSocial").isMongoId().withMessage("El ID de la obra social es obligatorio y debe ser válido"),
+  validateObraSocial,
   [
-    param("idObraSocial").isMongoId().withMessage("El ID de la obra social es obligatorio y debe ser válido"),
     body("code").notEmpty().withMessage("El código es obligatorio"),
     body("description").notEmpty().withMessage("La descripción es obligatoria"),
     body("validity").isDate().withMessage("La fecha de validez debe ser una fecha válida"),
@@ -25,6 +27,14 @@ route.post(
   ],
   handleImputErrors,
   CodigoController.createCodigo
+);
+
+route.get(
+  "/:idObraSocial/codes",
+  param("idObraSocial").isMongoId().withMessage("El ID de la obra social es obligatorio y debe ser válido"),
+  validateObraSocial,
+  handleImputErrors,
+  CodigoController.getCodigosByObraSocial
 );
 
 route.patch(
