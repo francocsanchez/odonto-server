@@ -8,13 +8,13 @@ export interface IAtencion {
   valor: number;
   pagoDentista: number;
   observaciones?: string;
+  pagado: boolean;
 }
 export interface IRegistro extends Document {
   fechaAtencion: Date;
   usuario: PopulatedDoc<IUsuario & Document>;
   paciente: PopulatedDoc<IPaciente & Document>;
   atencion: IAtencion[];
-  pagado: boolean;
 }
 
 const RegistroSchema: Schema = new Schema<IRegistro>(
@@ -28,9 +28,9 @@ const RegistroSchema: Schema = new Schema<IRegistro>(
         valor: { type: Number, required: true },
         pagoDentista: { type: Number, required: true },
         observaciones: { type: String, required: false },
+        pagado: { type: Boolean, required: true, default: false },
       },
     ],
-    pagado: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,
@@ -40,6 +40,5 @@ const RegistroSchema: Schema = new Schema<IRegistro>(
 RegistroSchema.index({ paciente: 1 });
 RegistroSchema.index({ fechaAtencion: -1 });
 RegistroSchema.index({ paciente: 1, fechaAtencion: -1 });
-RegistroSchema.index({ pagado: 1 });
 
 export default model<IRegistro>("registros", RegistroSchema);

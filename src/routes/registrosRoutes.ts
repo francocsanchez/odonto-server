@@ -2,27 +2,16 @@ import { Router } from "express";
 import { body, param } from "express-validator";
 import { handleImputErrors } from "../middleware/validation";
 import { RegistroController } from "../controllers/RegistroController";
+import { validatePaciente } from "../middleware/paciente";
 
 const route = Router();
 
 route.get("/", RegistroController.getAllRegistros);
 
-route.get("/pagados", RegistroController.getRegistrosPagados);
-
-route.get("/pendientes", RegistroController.getRegistrosPendientes);
-
-route.patch(
-  "/:idRegistro/pagar",
-  [
-    param("idRegistro").isMongoId().withMessage("ID de registro inválido"),
-    body("pagado").isBoolean().withMessage("El campo 'pagado' debe ser un booleano"),
-  ],
-  handleImputErrors,
-  RegistroController.pagarRegistro
-);
+route.param("idPaciente", validatePaciente);
 
 route.post(
-  "/",
+  "/:idPaciente/create",
   [
     body("fechaAtencion").isISO8601().withMessage("La fecha de atención debe ser una fecha válida"),
     body("usuario").isMongoId().withMessage("El ID de usuario debe ser válido"),
