@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import Pacientes from "../models/Pacientes";
+import { Registros, Pacientes } from "../models";
 
 export class PacienteController {
   static getAllPacientes = async (req: Request, res: Response): Promise<void> => {
     try {
-      const pacientes = await Pacientes.find();
+      const pacientes = await Pacientes.find().populate("obraSocial", "name");
       res.status(200).json(pacientes);
     } catch (error) {
       console.error(error.message);
@@ -13,7 +13,7 @@ export class PacienteController {
   };
 
   static createPaciente = async (req: Request, res: Response): Promise<void> => {
-    const { fullName, dni, number_social } = req.body;
+    const { fullName, dni, number_social, obraSocial } = req.body;
 
     const paciente = await Pacientes.find({ dni });
     if (paciente.length > 0) {
@@ -26,6 +26,7 @@ export class PacienteController {
         fullName,
         dni,
         number_social,
+        obraSocial,
       });
 
       await newPaciente.save();
@@ -40,7 +41,7 @@ export class PacienteController {
     const { idPaciente } = req.params;
 
     try {
-      const paciente = await Pacientes.findById(idPaciente);
+      const paciente = await Pacientes.findById(idPaciente).populate("obraSocial", "name");
       if (!paciente) {
         res.status(404).json({ message: "Paciente no encontrado" });
         return;
@@ -54,7 +55,7 @@ export class PacienteController {
 
   static updatePaciente = async (req: Request, res: Response): Promise<void> => {
     const { idPaciente } = req.params;
-    const { fullName, dni, number_social } = req.body;
+    const { fullName, dni, number_social, obraSocial } = req.body;
 
     try {
       const paciente = await Pacientes.findById(idPaciente);
@@ -77,6 +78,7 @@ export class PacienteController {
           fullName,
           dni,
           number_social,
+          obraSocial,
         },
         { new: true }
       );
@@ -85,6 +87,57 @@ export class PacienteController {
     } catch (error) {
       console.error(error.message);
       res.status(500).json({ message: "Error al actualizar el paciente" });
+    }
+  };
+
+  static getAllRegistrosByPacienteID = async (req: Request, res: Response): Promise<void> => {
+    const { idPaciente } = req.params;
+
+    try {
+      const paciente = await Pacientes.findById(idPaciente);
+      if (!paciente) {
+        res.status(404).json({ message: "Paciente no encontrado" });
+        return;
+      }
+
+      const registros = await Registros.find({ paciente: idPaciente })
+        .sort({ fechaAtencion: -1 })
+        .populate("usuario", "name lastName")
+        .populate("atencion.codigo", "description");
+
+      res.status(200).json(registros);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al obtener los registros del paciente" });
+    }
+  };
+
+  static getAllRegistrosByPacienteIDWithEstado = async (req: Request, res: Response): Promise<void> => {
+    const { idPaciente, estado } = req.params;
+
+    try {
+      const paciente = await Pacientes.findById(idPaciente);
+      if (!paciente) {
+        res.status(404).json({ message: "Paciente no encontrado" });
+        return;
+      }
+
+      const registros = await Registros.find({
+        paciente: idPaciente,
+        atencion: {
+          $elemMatch: {
+            pagado: estado,
+          },
+        },
+      })
+        .sort({ fechaAtencion: -1 })
+        .populate("usuario", "name lastName")
+        .populate("atencion.codigo", "description");
+
+      res.status(200).json(registros);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al obtener los registros del paciente" });
     }
   };
 }

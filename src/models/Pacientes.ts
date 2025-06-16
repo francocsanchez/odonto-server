@@ -1,4 +1,4 @@
-import { Schema, model, Document, PopulatedDoc } from "mongoose";
+import { Schema, model, Document, PopulatedDoc, Types } from "mongoose";
 import { IRegistro } from "./Registros";
 
 export interface IPaciente extends Document {
@@ -6,6 +6,7 @@ export interface IPaciente extends Document {
   dni: string;
   number_social: string;
   registros: PopulatedDoc<IRegistro & Document>[];
+  obraSocial: Types.ObjectId;
 }
 
 const PacienteSchema: Schema = new Schema<IPaciente>(
@@ -14,6 +15,7 @@ const PacienteSchema: Schema = new Schema<IPaciente>(
     dni: { type: String, required: true, unique: true },
     number_social: { type: String, required: true, unique: true },
     registros: [{ type: Schema.Types.ObjectId, ref: "registros" }],
+    obraSocial: { type: Schema.Types.ObjectId, ref: "obras_sociales", required: true },
   },
   {
     timestamps: true,

@@ -3,12 +3,20 @@ import { ICodigo } from "./Codigos";
 import { IPaciente } from "./Pacientes";
 import { IUsuario } from "./Usuarios";
 
+const registroEstado = {
+  APROBADO: "aprobado",
+  PENDIENTE: "pendiente",
+  RECHAZADO: "rechazado",
+} as const;
+
+export type RegistroEstado = (typeof registroEstado)[keyof typeof registroEstado];
+
 export interface IAtencion {
   codigo: PopulatedDoc<ICodigo & Document>;
   valor: number;
   pagoDentista: number;
   observaciones?: string;
-  pagado: boolean;
+  pagado: RegistroEstado;
 }
 export interface IRegistro extends Document {
   fechaAtencion: Date;
@@ -28,7 +36,7 @@ const RegistroSchema: Schema = new Schema<IRegistro>(
         valor: { type: Number, required: true },
         pagoDentista: { type: Number, required: true },
         observaciones: { type: String, required: false },
-        pagado: { type: Boolean, required: true, default: false },
+        pagado: { type: String, enum: Object.values(registroEstado), default: registroEstado.PENDIENTE },
       },
     ],
   },

@@ -35,4 +35,15 @@ route.put(
   ],
   PacienteController.updatePaciente
 );
+
+route.get("/:idPaciente/registros", PacienteController.getAllRegistrosByPacienteID);
+route.get(
+  "/:idPaciente/registros/:estado",
+  [
+    param("idPaciente").isMongoId().withMessage("ID de paciente inválido"),
+    param("estado").isIn(["aprobado", "pendiente", "rechazado"]).withMessage("El estado debe ser 'aprobado', 'pendiente' o 'rechazado'"),
+    handleImputErrors,
+  ],
+  PacienteController.getAllRegistrosByPacienteIDWithEstado
+);
 export default route;
