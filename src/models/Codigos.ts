@@ -8,10 +8,11 @@ export interface ICodigo extends Document {
   enable: boolean;
   obraSocial: Types.ObjectId;
 }
+
 const CodigoSchema: Schema = new Schema<ICodigo>(
   {
     description: { type: String, required: true },
-    code: { type: String, required: true, unique: true },
+    code: { type: String, required: true },
     validity: { type: Date, required: true },
     price: { type: Number, required: true },
     enable: { type: Boolean, required: true, default: true },
@@ -21,5 +22,7 @@ const CodigoSchema: Schema = new Schema<ICodigo>(
     timestamps: true,
   }
 );
+
+CodigoSchema.index({ code: 1, obraSocial: 1 }, { unique: true });
 
 export default model<ICodigo>("codigos", CodigoSchema);

@@ -1,10 +1,14 @@
 import { Router } from "express";
+import multer from "multer";
 import { body, param } from "express-validator";
 import { CodigoController } from "../controllers/CodigoController";
 import { handleImputErrors } from "../middleware/validation";
 import { validateObraSocial } from "../middleware/obraSocial";
 
 const route = Router();
+
+// Multer configurado en memoria (no guarda archivos en disco)
+const upload = multer({ storage: multer.memoryStorage() });
 
 route.get("/", CodigoController.getAllCodigos);
 
@@ -42,6 +46,13 @@ route.get(
   param("idObraSocial").isMongoId().withMessage("El ID de la obra social es obligatorio y debe ser válido"),
   handleImputErrors,
   CodigoController.getCodigosByObraSocial
+);
+
+route.post(
+  "/importar",
+  [body("obraSocialId").isMongoId().withMessage("El ID de la obra social es obligatorio y debe ser válido")],
+  upload.single("archivo"),
+  CodigoController.importarCodigos
 );
 
 export default route;

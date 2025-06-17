@@ -3,9 +3,19 @@ import { Request, Response } from "express";
 import ObrasSociales from "../models/ObrasSociales";
 
 export class ObraSocialController {
+  static getAllObrasSocialesActives = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const obrasSociales = await ObrasSociales.find({ enable: true }).populate("codes").sort({ name: 1 });
+      res.status(200).json(obrasSociales);
+    } catch (error) {
+      console.error(colors.red(error.message));
+      res.status(500).json({ message: "Error al obtener las obras sociales" });
+    }
+  };
+
   static getAllObrasSociales = async (req: Request, res: Response): Promise<void> => {
     try {
-      const obrasSociales = await ObrasSociales.find().populate("codes");
+      const obrasSociales = await ObrasSociales.find().populate("codes").sort({ name: 1 });
       res.status(200).json(obrasSociales);
     } catch (error) {
       console.error(colors.red(error.message));
@@ -54,7 +64,7 @@ export class ObraSocialController {
         res.status(404).json({ message: "Obra social no encontrada" });
         return;
       }
-      res.status(200).json(updatedObraSocial);
+      res.status(200).json({ message: "Obra social actualizada correctamente" });
     } catch (error) {
       console.error(colors.red(error.message));
       res.status(500).json({ message: "Error al actualizar la obra social" });

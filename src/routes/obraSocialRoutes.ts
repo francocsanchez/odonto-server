@@ -5,7 +5,8 @@ import { ObraSocialController } from "../controllers/ObraSocialController";
 
 const route = Router();
 
-route.get("/", ObraSocialController.getAllObrasSociales);
+route.get("/", ObraSocialController.getAllObrasSocialesActives);
+route.get("/totals", ObraSocialController.getAllObrasSociales);
 
 route.post(
   "/",
@@ -31,7 +32,7 @@ route.put(
   ObraSocialController.updateObraSocial
 );
 
-route.post(
+route.patch(
   "/:idObraSocial/change-state",
   param("idObraSocial").isMongoId().withMessage("ID de obra social inválido"),
   handleImputErrors,
