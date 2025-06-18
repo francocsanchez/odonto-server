@@ -27,7 +27,6 @@ export class CodigoController {
         res.status(400).json(error.message);
         return;
       }
-
       const newCodigo = new Codigos({ code, description, validity, price, obraSocial: req.obraSocial.id });
 
       req.obraSocial.codes.push(newCodigo.id);
@@ -36,7 +35,7 @@ export class CodigoController {
 
       res.status(201).json("Código creado exitosamente");
     } catch (error) {
-      console.error(colors.red(error.message));
+      console.error(colors.red(error));
       res.status(500).json({ message: "Error al crear el código" });
     }
   };
