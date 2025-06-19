@@ -1,6 +1,6 @@
 import colors from "colors";
 import { Request, Response } from "express";
-import { Codigos, ObrasSociales } from "../models";
+import { Codigos, ObrasSociales, Pacientes } from "../models";
 
 import * as XLSX from "xlsx";
 import { parseExcelDate } from "../helpers";
@@ -186,6 +186,26 @@ export class CodigoController {
     } catch (error) {
       console.error("Error general al importar códigos:", error);
       res.status(500).json({ message: "Error al importar códigos" });
+    }
+  };
+
+  static getAllCodigosWithObraSocial = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { idPaciente } = req.params;
+
+      const paciente = await Pacientes.findById(idPaciente).populate("obraSocial");
+
+      if (!paciente) {
+        res.status(404).json({ message: "Usuario no encontrado" });
+        return;
+      }
+
+      const codigos = await Codigos.find({ obraSocial: paciente.obraSocial._id, enable: true }, "_id description code").sort({ description: 1 });
+
+      res.json(codigos);
+    } catch (error) {
+      console.error("Error al obtener los códigos:", error);
+      res.status(500).json({ message: "Error al obtener los códigos" });
     }
   };
 }

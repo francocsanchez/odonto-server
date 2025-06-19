@@ -12,6 +12,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 route.get("/", CodigoController.getAllCodigos);
 
+route.get("/:idPaciente/codigos", CodigoController.getAllCodigosWithObraSocial);
+
 route.get(
   "/:idCodigo",
   param("idCodigo").isMongoId().withMessage("El ID del código es obligatorio y debe ser válido"),
